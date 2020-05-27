@@ -3,6 +3,9 @@ package eu.dauphine;
 public class Alert {
     public String uid;
 
+    public Alert() {
+
+    }
     public Alert(String uid) {
         this.uid = uid;
     }
@@ -13,5 +16,12 @@ public class Alert {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    @Override
+    public String toString() {
+        return "Alert{" +
+                "uid='" + uid + '\'' +
+                '}';
     }
 }

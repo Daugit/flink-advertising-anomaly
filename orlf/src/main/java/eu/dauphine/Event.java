@@ -12,6 +12,26 @@ public class Event {
     public String ip;
     public String impressionId;
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getImpressionId() {
+        return impressionId;
+    }
+
     public Event(String eventType, String uid, Long timestamp, String ip, String impressionId) {
         this.eventType = eventType;
         this.uid = uid;

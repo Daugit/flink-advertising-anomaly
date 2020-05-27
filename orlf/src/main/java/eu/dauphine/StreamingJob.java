@@ -18,14 +18,11 @@
 
 package eu.dauphine;
 
-import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -76,13 +73,22 @@ public class StreamingJob {
 		topics.add("clicks");
 		topics.add("displays");
 
-		DataStream<Event> inputStream = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties));
-		inputStream.print();
-	/*
-		DataStream<Alert> alerts = inputStream
-				.keyBy(Transaction::getAccountId)
-				.process(new FraudDetector())
-				.name("fraud-detector");*/
+		DataStream<Event> events = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties));
+
+		FraudDetector detector = new FraudDetector();
+
+		DataStream<Alert> alertsUid = events
+				.keyBy(Event::getUid)
+				.process(detector)
+				.name("fraud-detector-uid");
+
+
+		/*DataStream<Alert> alertsIp = events
+				.keyBy(Event::getIp)
+				.process(detector)
+				.name("fraud-detector-ip");*/
+
+		alertsUid.print();
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
 	}
