@@ -3,10 +3,10 @@ package eu.dauphine;
 public class AlertIp {
     public String ip;
 
-    public Alert() {
+    public AlertIp() {
 
     }
-    public Alert(String ip) {
+    public AlertIp(String ip) {
         this.ip = ip;
     }
 

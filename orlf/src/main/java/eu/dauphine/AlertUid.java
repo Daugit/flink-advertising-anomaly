@@ -3,10 +3,10 @@ package eu.dauphine;
 public class AlertUid {
     public String uid;
 
-    public Alert() {
+    public AlertUid() {
 
     }
-    public Alert(String uid) {
+    public AlertUid(String uid) {
         this.uid = uid;
     }
 

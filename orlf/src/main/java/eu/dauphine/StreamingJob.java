@@ -75,20 +75,28 @@ public class StreamingJob {
 
 		DataStream<Event> events = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties));
 
-		FraudDetector detector = new FraudDetector();
+		FraudDetectorUid detectorUid = new FraudDetectorUid();
+		FraudDetectorIp detectorIp = new FraudDetectorIp();
+		FraudDetectorCtr detectorCtr = new FraudDetectorCtr();
 
 		DataStream<AlertUid> alertsUid = events
 				.keyBy(Event::getUid)
-				.process(detector)
+				.process(detectorUid)
 				.name("fraud-detector-uid");
 
 
 		DataStream<AlertIp> alertsIp = events
 				.keyBy(Event::getIp)
-				.process(detector)
+				.process(detectorIp)
 				.name("fraud-detector-ip");
 
+		DataStream<AlertCtr> alertsCtr = events
+				.keyBy(0)
+				.process(detectorCtr)
+				.name("fraud-detector-ctr");
 		alertsUid.print();
+		alertsIp.print();
+
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
 	}
