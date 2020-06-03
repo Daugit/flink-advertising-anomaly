@@ -1,6 +1,6 @@
 package eu.dauphine;
 
-public class Alert {
+public class AlertUid {
     public String uid;
 
     public Alert() {

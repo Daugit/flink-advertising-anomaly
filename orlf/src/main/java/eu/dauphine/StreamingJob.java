@@ -77,16 +77,16 @@ public class StreamingJob {
 
 		FraudDetector detector = new FraudDetector();
 
-		DataStream<Alert> alertsUid = events
+		DataStream<AlertUid> alertsUid = events
 				.keyBy(Event::getUid)
 				.process(detector)
 				.name("fraud-detector-uid");
 
 
-		/*DataStream<Alert> alertsIp = events
+		DataStream<AlertIp> alertsIp = events
 				.keyBy(Event::getIp)
 				.process(detector)
-				.name("fraud-detector-ip");*/
+				.name("fraud-detector-ip");
 
 		alertsUid.print();
 		// execute program
