@@ -84,7 +84,7 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
                 } else {
                     int count = ((List<Long>) clickState.get()).size() +
                             ((List<Long>) displayState.get()).size();
-                    if (count > 20) {
+                    if (count > 5) {
                         AlertIp alert = new AlertIp();
                         alert.setIp(event.getIp());
                         collector.collect(alert);

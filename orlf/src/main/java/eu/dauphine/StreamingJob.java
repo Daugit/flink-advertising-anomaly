@@ -26,6 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/*
+TODO: Mettre 5 pour le threshold
+ */
+
+
 /**
  * Skeleton for a Flink Streaming Job.
  *
@@ -77,25 +82,20 @@ public class StreamingJob {
 
 		FraudDetectorUid detectorUid = new FraudDetectorUid();
 		FraudDetectorIp detectorIp = new FraudDetectorIp();
-		FraudDetectorCtr detectorCtr = new FraudDetectorCtr();
 
 		DataStream<AlertUid> alertsUid = events
 				.keyBy(Event::getUid)
 				.process(detectorUid)
 				.name("fraud-detector-uid");
 
-
+		/*
 		DataStream<AlertIp> alertsIp = events
 				.keyBy(Event::getIp)
 				.process(detectorIp)
 				.name("fraud-detector-ip");
-
-		DataStream<AlertCtr> alertsCtr = events
-				.keyBy(0)
-				.process(detectorCtr)
-				.name("fraud-detector-ctr");
+		*/
 		alertsUid.print();
-		alertsIp.print();
+		//alertsIp.print();
 
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
