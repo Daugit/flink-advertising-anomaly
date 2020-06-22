@@ -7,6 +7,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +20,10 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
     //private static final long ONE_MINUTE = 60 * 1000;
     private transient ListState<Long> clickState;
     private transient ListState<Long> displayState;
+
+
+    private List<String> ip_to_remove = new ArrayList<>();
+
 
     private int counter = 0;
     @Override
@@ -84,10 +89,15 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
                 } else {
                     int count = ((List<Long>) clickState.get()).size() +
                             ((List<Long>) displayState.get()).size();
-                    if (count > 5) {
-                        AlertIp alert = new AlertIp();
-                        alert.setIp(event.getIp());
-                        collector.collect(alert);
+                    if (count > 20) {
+
+                        if(!ip_to_remove.contains(event.getIp())){
+                            AlertIp alert = new AlertIp();
+                            alert.setIp(event.getIp());
+                            collector.collect(alert);
+                            ip_to_remove.add(event.getIp());
+                        }
+
                     }
                     break;
                 }

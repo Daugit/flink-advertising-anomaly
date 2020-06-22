@@ -20,8 +20,13 @@ public class AlertIp {
 
     @Override
     public String toString() {
+
+        return ip;
+        /*
         return "Alert{" +
                 "ip='" + ip + '\'' +
                 '}';
+
+         */
     }
 }

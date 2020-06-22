@@ -14,11 +14,17 @@ public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertU
 
     private static final long serialVersionUID = 1L;
 
-    //private static final double SMALL_AMOUNT = 1.00;
-    //private static final double LARGE_AMOUNT = 500.00;
-    //private static final long ONE_MINUTE = 60 * 1000;
+    /**
+     * Count the number of clicks per uid every quarter
+     */
     private transient ListState<Long> clickStateQuarter;
+    /**
+     * Count the number of clicks per uid every hour
+     */
     private transient ListState<Long> clickStateHour;
+    /**
+     * Count the number of displays per uid every hour
+     */
     private transient ListState<Long> displayStateHour;
 
     private List<String> uids_to_remove;
@@ -59,6 +65,9 @@ public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertU
         }
 
         if(timestamp_end-timestamp_start >= 15*60) {
+
+            System.out.println("++++++++++++++++++++++++++ BEFORE : "  +map_uid_ctr.keySet().size());
+
             Map<String, Float> result = map_uid_ctr.entrySet()
                     .stream()
                     .filter(map -> !uids_to_remove.contains(map.getKey()))
@@ -70,7 +79,7 @@ public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertU
                 sum+=result.get(key);
             }
             sum /= result.size();
-            System.out.println("####################### " + sum + " #######################");
+            System.out.println("####################### " + sum + " #######################" + result.keySet().size());
 
 
             double sum2 = 0.0;
@@ -79,7 +88,7 @@ public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertU
                 sum2+=map_uid_ctr.get(key);
             }
             sum2 /= map_uid_ctr.size();
-            System.out.println("++++++++++++++++++++++++++ No FILTER : " + sum2 + "+++++++++++++++++++++++++++++++++++");
+            System.out.println("++++++++++++++++++++++++++ No FILTER : " + sum2 + "+++++++++++++++++++++++++++++++++++"+map_uid_ctr.keySet().size());
 
             timestamp_start = event.getTimestamp();
             timestamp_end = event.getTimestamp();

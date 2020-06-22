@@ -20,8 +20,13 @@ public class AlertUid {
 
     @Override
     public String toString() {
+
+        return uid;
+        /*
         return "Alert{" +
                 "uid='" + uid + '\'' +
                 '}';
+
+         */
     }
 }

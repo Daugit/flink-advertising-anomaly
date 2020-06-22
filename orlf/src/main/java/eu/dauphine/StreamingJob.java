@@ -67,7 +67,7 @@ public class StreamingJob {
 		 */
 
 		// set up the streaming execution environment
-		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
 
 		Properties properties = new Properties();
 		properties.setProperty("bootstrap.servers", "localhost:9092");
@@ -78,7 +78,7 @@ public class StreamingJob {
 		topics.add("clicks");
 		topics.add("displays");
 
-		DataStream<Event> events = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties));
+		DataStream<Event> events = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties)).setParallelism(1);
 
 		FraudDetectorUid detectorUid = new FraudDetectorUid();
 		FraudDetectorIp detectorIp = new FraudDetectorIp();
@@ -86,17 +86,22 @@ public class StreamingJob {
 		DataStream<AlertUid> alertsUid = events
 				.keyBy(Event::getUid)
 				.process(detectorUid)
-				.name("fraud-detector-uid");
+				.name("fraud-detector-uid")
+				.setParallelism(1);
 
-		/*
+
 		DataStream<AlertIp> alertsIp = events
 				.keyBy(Event::getIp)
 				.process(detectorIp)
-				.name("fraud-detector-ip");
-		*/
-		alertsUid.print();
-		//alertsIp.print();
+				.name("fraud-detector-ip")
+				.setParallelism(1);
 
+		alertsUid.print();
+		alertsIp.print();
+
+		alertsUid.writeAsText("./outputs/uid_alert.txt");
+		alertsIp.writeAsText("./outputs/ip_alert.txt");
+		events.writeAsText("./outputs/events.txt");
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
 	}
