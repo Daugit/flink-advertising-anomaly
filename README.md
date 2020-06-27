@@ -1,7 +1,6 @@
-# flink-advertising-anomaly
+# Flink-advertising-anomaly
 
-docker-compose rm -f; docker-compose up
+The goal of this school project is to detect anomalies from advertising events (clicks & displays) from Criteo data, using a streaming flow from Kafka and creating a real-time alerting job with Flink.
 
-https://ci.apache.org/projects/flink/flink-docs-release-1.10/getting-started/walkthroughs/datastream_api.html#collapse-11
-
-The goal of this school project is to detect anomalies in advertising clicks and displays from Criteo, using Kafka and Flink.
+This repository gathers our flink implementation under the "orlf" directory. 
+We advise the reader to start with the python notebook named "Exploration&Results.ipynb". This python notebook describes our method to identify the uids and ip to remove. Also, it shows that the Flink implementation is successful.
