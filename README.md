@@ -1,5 +1,7 @@
 # Flink-advertising-anomaly
 
+This project was written by Olivier Randavel and Louis Fontaine
+
 The goal of this school project is to detect anomalies from advertising events (clicks & displays) from Criteo data, using a streaming flow from Kafka and creating a real-time alerting job with Flink.
 
 This repository gathers our flink implementation under the "orlf" directory. 
