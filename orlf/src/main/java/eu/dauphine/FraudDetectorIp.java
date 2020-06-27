@@ -11,21 +11,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Take as input the Event Stream (click or display) and return an Alert Stream of fraudulent IPs
+ */
 public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp> {
+
+    private static final int THRESHOLD = 20;
 
     private static final long serialVersionUID = 1L;
 
-    //private static final double SMALL_AMOUNT = 1.00;
-    //private static final double LARGE_AMOUNT = 500.00;
-    //private static final long ONE_MINUTE = 60 * 1000;
+    /**
+     * Count the number of clicks per ip every quarter-hour : save a list of timestamps of the clicks
+     */
     private transient ListState<Long> clickState;
+    /**
+     * Count the number of displays per ip every quarter-hour : save a list of timestamps of the displays
+     */
     private transient ListState<Long> displayState;
 
-
+    //List of fraudulent IPs to remove
     private List<String> ip_to_remove = new ArrayList<>();
 
-
-    private int counter = 0;
     @Override
     public void open(Configuration parameters) {
         ListStateDescriptor<Long> clickDescriptor = new ListStateDescriptor<>(
@@ -39,22 +45,25 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
         displayState = getRuntimeContext().getListState(displayDescriptor);
     }
 
-    //retirer les ips avec plus de 20 clicks/displays sur 15'
+    /**
+     * Remove IPs which the number of clicks per quarter-hour is more than a threshold
+     */
     @Override
     public void processElement(
             Event event,
             Context context,
             Collector<AlertIp> collector) throws Exception {
+
         if(event.getEventType().equals("click") || event.getEventType().equals("display")){
 
             if (event.getEventType().equals("click")) {clickState.add(event.getTimestamp()); }
             else {displayState.add(event.getTimestamp());}
 
             while(true) {
-                Long _max_click;
-                Long _min_click;
-                Long _max_display;
-                Long _min_display;
+                Long _max_click; //max timestamp of click
+                Long _min_click; //min timestamp of click
+                Long _max_display; //max timestamp of display
+                Long _min_display; //min timestamp of display
 
                 if(((List)clickState.get()).size()==0) {
                     _max_click = 0L;
@@ -72,7 +81,9 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
                     _min_display = (Long) Collections.min((List) displayState.get());
                 }
 
-
+                /**
+                 * Implementation of Session Windows
+                 */
                 if (_max_click - _min_click > 15 * 60 ||
                         _max_display - _min_display > 15 * 60) {
 
@@ -87,14 +98,13 @@ public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp
                         displayState.update(tmp);}
 
                 } else {
-                    int count = ((List<Long>) clickState.get()).size() +
-                            ((List<Long>) displayState.get()).size();
-                    if (count > 20) {
+                    int count = ((List<Long>) clickState.get()).size();
+                    if (count > THRESHOLD) {
 
                         if(!ip_to_remove.contains(event.getIp())){
                             AlertIp alert = new AlertIp();
                             alert.setIp(event.getIp());
-                            collector.collect(alert);
+                            collector.collect(alert); //Send alert to the collector if never sent before
                             ip_to_remove.add(event.getIp());
                         }
 

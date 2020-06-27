@@ -26,45 +26,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/*
-TODO: Mettre 5 pour le threshold
- */
+import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
 
 /**
- * Skeleton for a Flink Streaming Job.
- *
- * <p>For a tutorial how to write a Flink streaming application, check the
- * tutorials and examples on the <a href="https://flink.apache.org/docs/stable/">Flink Website</a>.
- *
- * <p>To package your application into a JAR file for execution, run
- * 'mvn clean package' on the command line.
- *
- * <p>If you change the name of the main class (with the public static void main(String[] args))
- * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
+ * The goal of the project is to create a Flink application which will read from Kafka clicks and displays, detect some suspicious/fraudulent activities and output the suspicious IP or UID into a file.
  */
 public class StreamingJob {
 
 	public static void main(String[] args) throws Exception {
-		/*
-		 * Here, you can start creating your execution plan for Flink.
-		 *
-		 * Start with getting some data from the environment, like
-		 * 	env.readTextFile(textPath);
-		 *
-		 * then, transform the resulting DataStream<String> using operations
-		 * like
-		 * 	.filter()
-		 * 	.flatMap()
-		 * 	.join()
-		 * 	.coGroup()
-		 *
-		 * and many more.
-		 * Have a look at the programming guide for the Java API:
-		 *
-		 * https://flink.apache.org/docs/latest/apis/streaming/index.html
-		 *
-		 */
 
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
@@ -78,18 +48,22 @@ public class StreamingJob {
 		topics.add("clicks");
 		topics.add("displays");
 
+		//Transform a Kafka source of clicks and displays to a DataStream of Event (java object)
 		DataStream<Event> events = env.addSource(new FlinkKafkaConsumer<>(topics, new DeserializationToEventSchema(), properties)).setParallelism(1);
 
+		//Fraud detector of UID which clicks too often
 		FraudDetectorUid detectorUid = new FraudDetectorUid();
+		//Fraud detector of IP which clicks too often
 		FraudDetectorIp detectorIp = new FraudDetectorIp();
 
+		//Take as input the Event Stream (click or display) and return an Alert Stream of fraudulent UIDs
 		DataStream<AlertUid> alertsUid = events
 				.keyBy(Event::getUid)
 				.process(detectorUid)
 				.name("fraud-detector-uid")
 				.setParallelism(1);
 
-
+		//Take as input the Event Stream (click or display) and return an Alert Stream of fraudulent IPs
 		DataStream<AlertIp> alertsIp = events
 				.keyBy(Event::getIp)
 				.process(detectorIp)
@@ -99,10 +73,10 @@ public class StreamingJob {
 		alertsUid.print();
 		alertsIp.print();
 
-		alertsUid.writeAsText("./outputs/uid_alert.txt");
-		alertsIp.writeAsText("./outputs/ip_alert.txt");
-		events.writeAsText("./outputs/events.txt");
+		alertsUid.writeAsText("./outputs/uid_alert.txt",OVERWRITE);
+		alertsIp.writeAsText("./outputs/ip_alert.txt",OVERWRITE);
+		events.writeAsText("./outputs/events.txt",OVERWRITE);
 		// execute program
-		env.execute("Flink Streaming Java API Skeleton");
+		env.execute("Flink Streaming Java API to detect fraudulent clicks in ads.");
 	}
 }

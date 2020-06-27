@@ -5,6 +5,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * An event can be a Click event or a display event.
+ */
 public class Event {
     public String eventType;
     public String uid;
