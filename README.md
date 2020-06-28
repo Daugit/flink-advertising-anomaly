@@ -10,7 +10,7 @@ We advise the reader to start with the python notebook named "Exploration&Result
 It is possible to clone this projet, then follow these steps to reproduce all experiments : 
 
 1. To start the Kafka streaming flow follow indications from this [git](https://github.com/Sabmit/paris-dauphine)
-2. Import docker-compose.yml file from this [link](https://github.com/Sabmit/paris-dauphine/tree/master/docker/kafka-zk)
-3. From your terminal, execute "docker-compose rm -f; docker-compose up " to start the streaming data of advertising events
-4. Finally run orlf/src/main/java/eu/dauphine/StreamingJob.java 
-5. Our results are availaible throught this directory orlf/outputs/. It shows all events and the fraudulent uids and ip.
+2. Import `docker-compose.yml` file from this [link](https://github.com/Sabmit/paris-dauphine/tree/master/docker/kafka-zk)
+3. From your terminal, execute `docker-compose rm -f; docker-compose up` to start the streaming data of advertising events
+4. Finally run `orlf/src/main/java/eu/dauphine/StreamingJob.java` 
+5. Our results are availaible throught this directory `orlf/outputs/`. It shows all events and the fraudulent uids and ip.
