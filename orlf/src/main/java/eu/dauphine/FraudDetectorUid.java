@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertUid> {
 
-    private static final int THRESHOLD = 5;
+    private static final int THRESHOLD = 40;
 
     private static final long serialVersionUID = 1L;
 
@@ -111,8 +111,8 @@ public class FraudDetectorUid extends KeyedProcessFunction<String, Event, AlertU
         }
 
         if(event.getEventType().equals("display")) {
-            displayStateHour.add(event.getTimestamp());
             displayStateQuarter.add(event.getTimestamp());
+            displayStateHour.add(event.getTimestamp());
 
             while(true) {
                 Long _maxHour = (Long) Collections.max((List) displayStateHour.get());

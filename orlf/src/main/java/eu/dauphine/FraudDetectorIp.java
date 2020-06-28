@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class FraudDetectorIp extends KeyedProcessFunction<String, Event, AlertIp> {
 
-    private static final int THRESHOLD = 20;
+    private static final int THRESHOLD = 10;
 
     private static final long serialVersionUID = 1L;
 
